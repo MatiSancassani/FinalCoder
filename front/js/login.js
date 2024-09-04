@@ -18,10 +18,14 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
         .then(data => {
             const resultDiv = document.getElementById('result');
             if (data.success) {
+                const userId = data.user._id
+                if (userId) {
+                    localStorage.setItem('userId', userId);
+                }
                 resultDiv.innerHTML = `<p>${data.message}</p>`;
                 getCartId().then(cartId => {
                     if (cartId) {
-                        // console.log('Cart ID obtenido y guardado: ', cartId);
+                        localStorage.setItem('userEmail', email);
                         setTimeout(() => {
                             window.location.href = 'index.html'; // Redirigir a index.html después de 1 segundo
                         }, 1000);

@@ -41,7 +41,7 @@ const getProductsInCart = async () => {
                     </div>
                     <div class="itemContainer">
                         <h3>Precio:</h3>
-                        <small>${products.id.price}</small>
+                        <small>$${products.id.price}</small>
                     </div>
                     <div class="itemContainer">
                         <h3>Cantidad:</h3>
@@ -53,7 +53,7 @@ const getProductsInCart = async () => {
                     </div>
                     <div class="itemContainer">
                         <h3>Total:</h3>
-                        <small>${products.id.price * products.quantity}</small>
+                        <small>$${products.id.price * products.quantity}</small>
                     </div>
                     <button class="edit-button">
                         <svg class="edit-svgIcon" viewBox="0 0 512 512">

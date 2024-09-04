@@ -6,6 +6,7 @@ let productsData = [];
 
 window.addEventListener('DOMContentLoaded', () => {
     getProducts();
+    updateCartCount();
 })
 
 // OBTENER LISTA DE PRODUCTOS CON METODO GET
@@ -23,19 +24,21 @@ const getProducts = async () => {
         }
         const jsonResponse = await response.json();
         const products = jsonResponse.payload;
+
         // ACA GUARDO LO TRAIDO DE LA BASE DE DATOS EN LA VARIABLE CREADA AL PRINCIPIO, PARA HACER USO GLOBAL LUEGO!!
         productsData = products
-
+        const email = localStorage.getItem('userEmail');
         products.forEach(product => {
             const div = document.createElement("div");
             div.classList.add("card-container");
-            div.innerHTML = `
+            if (email === product.owner) {
+                div.innerHTML = `
             <div class="actionMenu">
                 <button type="button" class="btn buttonEdit" data-bs-toggle="modal" data-bs-target="#exampleModa2" onclick="editProduct('${product._id}')">
                     <i class="bi bi-pencil-square buttonEdit"></i>
                 </button>
 
-                <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal3">
+                <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#exampleModal3" onclick="obtainIdProduct('${product._id}')">
                     <i class="bi bi-trash3-fill buttonRemove"></i>
                 </button>        
             </div>
@@ -43,8 +46,16 @@ const getProducts = async () => {
                 <h3 class="title-card">${product.title}</h3>
                 <p class="desc-card">${product.description}</p>
                 <p class="price-card">$${product.price}</p>
-                <button class="button-card" id="${product._id}">Add to cart</button>
             `;
+            } else {
+                div.innerHTML = `
+                <img class="img-card" src="${product.thumbnail}" alt="${product.title}">                
+                <h3 class="title-card">${product.title}</h3>
+                <p class="desc-card">${product.description}</p>
+                <p class="price-card">$${product.price}</p>
+                <button class="button-card" id="buttonAddToCart" onclick="addProductInCart('${product._id}')">Add to cart</button>
+            `;
+            }
             productsContainer.append(div);
         })
 
@@ -53,42 +64,6 @@ const getProducts = async () => {
     }
 
 };
-
-// ENVIAR FORM CON METODO POST
-
-const createProduct = async () => {
-    try {
-
-        const form = new FormData(document.querySelector('#product-form'));
-
-        const product = {
-            title: form.get('title'),
-            description: form.get('description'),
-            price: form.get('price'),
-            stock: form.get('stock'),
-            category: form.get('category')
-        }
-
-        const response = await fetch(API, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(product),
-            credentials: 'include' // Para enviar cookies en la petición
-        });
-        const addproduct = await response.json();
-        productsContainer.innerHTML = '';
-        getProducts();
-    } catch (error) {
-        console.log('Algo salio mal en POST')
-    }
-}
-
-const addproductButton = document.querySelector('#addproduct');
-addproductButton.addEventListener('click', createProduct);
-
-
 
 // EDITAR FORM CON METODO PUT
 
@@ -139,6 +114,120 @@ const updateProduct = async () => {
 }
 const confirmEditButton = document.querySelector('#confirmEditButton');
 confirmEditButton.addEventListener('click', updateProduct);
+
+//  OBTENER ID AL CLICKEAR MODAL DELETE
+const obtainIdProduct = (productId) => {
+    let product = productsData.find(p => p._id === productId);
+    if (product) {
+        const id = product._id;
+        const IdLS = localStorage.setItem('ID', id);
+    }
+}
+
+const deleteProduct = async () => {
+    try {
+        const pid = localStorage.getItem('ID')
+        const API2 = `http://localhost:8030/api/products/${pid}`
+
+        const response = await fetch(API2, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(),
+            credentials: 'include'
+        });
+        const jsonResponse = await response.json();
+        console.log(jsonResponse)
+    } catch (error) {
+        console.log('Algo salio mal en DELETE:', error)
+    }
+}
+const confirmDeleteButton = document.querySelector('#confirmDeleteButton');
+confirmDeleteButton.addEventListener('click', deleteProduct);
+
+
+// ADD PRODUCT IN CART
+
+
+const addProductInCart = async (pid) => {
+    try {
+        // const pid = localStorage.getItem('ID');
+        const cid = localStorage.getItem('cart_id');
+        if (!cid || !pid) {
+            console.log('Faltan datos: cid o pid no está definido');
+            return;
+        }
+        const APICART = `http://localhost:8030/api/carts/${cid}/product/${pid}`;
+        const response = await fetch(APICART, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(),
+            credentials: 'include'
+        });
+
+        const jsonResponse = await response.json();
+        console.log(jsonResponse)
+        if (response.ok) {
+            Toastify({
+                text: "Producto agregado al carrito con éxito.",
+                duration: 1500,
+                close: true,
+                gravity: "bottom",
+                position: "right",
+                backgroundColor: "#000",
+            }).showToast()
+        }
+        updateCartCount()
+    } catch (error) {
+        console.log('Algo salio mal en AddToCart:', error)
+    }
+}
+
+
+// Función para actualizar el número de elementos en el carrito
+const updateCartCount = async () => {
+    try {
+        const cid = localStorage.getItem('cart_id');
+        if (!cid) {
+            console.log('Carrito no encontrado.');
+            return;
+        }
+
+        const APICART = `http://localhost:8030/api/carts/${cid}`;
+        const response = await fetch(APICART, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        if (response.ok) {
+            const cart = await response.json();
+            console.log(cart.payload.cart.products);
+
+            const totalItems = cart.payload.cart.products.reduce((total, product) => {
+                return total + product.quantity;
+            }, 0);
+
+            console.log('Total items in cart:', totalItems);
+
+
+            document.getElementById('numCart').textContent = totalItems;
+        } else {
+            console.log('Error al obtener los datos del carrito.');
+        }
+    } catch (error) {
+        console.log('Error al actualizar el contador del carrito:', error);
+    }
+};
+
+
+
+
 
 
 
