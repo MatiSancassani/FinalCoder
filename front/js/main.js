@@ -24,9 +24,9 @@ const getProducts = async () => {
         }
         const jsonResponse = await response.json();
         const products = jsonResponse.payload;
-
         // ACA GUARDO LO TRAIDO DE LA BASE DE DATOS EN LA VARIABLE CREADA AL PRINCIPIO, PARA HACER USO GLOBAL LUEGO!!
         productsData = products
+        productsContainer.innerHTML = '';
         const email = localStorage.getItem('userEmail');
         products.forEach(product => {
             const div = document.createElement("div");
@@ -108,6 +108,7 @@ const updateProduct = async () => {
             credentials: 'include' // Para enviar cookies en la petición
         });
         const jsonResponse = await response.json();
+        getProducts();
     } catch (error) {
         console.log('Algo salio mal en PUT:', error)
     }
@@ -138,7 +139,8 @@ const deleteProduct = async () => {
             credentials: 'include'
         });
         const jsonResponse = await response.json();
-        console.log(jsonResponse)
+        getProducts();
+        // console.log(jsonResponse)
     } catch (error) {
         console.log('Algo salio mal en DELETE:', error)
     }
@@ -177,7 +179,12 @@ const addProductInCart = async (pid) => {
                 close: true,
                 gravity: "bottom",
                 position: "right",
-                backgroundColor: "#000",
+                style: {
+                    background: "#000",
+                    color: "#fff",
+                    textAlign: 'center',
+                    borderRadius: '1rem'
+                }
             }).showToast()
         }
         updateCartCount()
@@ -207,13 +214,13 @@ const updateCartCount = async () => {
 
         if (response.ok) {
             const cart = await response.json();
-            console.log(cart.payload.cart.products);
+            // console.log(cart.payload.cart.products);
 
             const totalItems = cart.payload.cart.products.reduce((total, product) => {
                 return total + product.quantity;
             }, 0);
 
-            console.log('Total items in cart:', totalItems);
+            // console.log('Total items in cart:', totalItems);
 
 
             document.getElementById('numCart').textContent = totalItems;
