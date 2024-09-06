@@ -1,6 +1,7 @@
 const cartContainer = document.querySelector('#productsInCart');
 const cid = localStorage.getItem('cart_id')
-const APIWITHID = `http://localhost:8030/api/carts/${cid}`
+const APIWITHID = `http://localhost:8030/api/carts/${cid}`;
+const totalCart = document.querySelector('#totalCart');
 let productsInCart = [];
 window.addEventListener('DOMContentLoaded', () => {
     getProductsInCart();
@@ -47,9 +48,9 @@ const getProductsInCart = async () => {
                     <div class="itemContainer">
                         <h3>Cantidad:</h3>
                         <div class="itemCant">
-                            <button class="buttonCant">-</button>
-                            <small>${products.quantity}</small>
-                            <button class="buttonCant">+</button>
+                            <button class="buttonCant" id="less-${products.id._id}">-</button>
+                            <small id="quantity-${products.id._id}">${products.quantity}</small>
+                            <button class="buttonCant" id="more-${products.id._id}">+</button>
                         </div>
                     </div>
                     <div class="itemContainer">
@@ -65,17 +66,56 @@ const getProductsInCart = async () => {
                     `;
 
             cartContainer.append(div);
+
             const deleteProduct = document.querySelector(`#delete${products.id._id}`)
             deleteProduct.addEventListener('click', () => {
                 deleteProductInCart();
             })
+
+            const updateQuantity = (pid, currentQuantity) => {
+                let newQuantity = currentQuantity;
+                if (newQuantity < 1) return;  // Avoid quantity less than 1
+                updateProductQuantity(pid, newQuantity);
+            };
+
+            const quantityElement = document.querySelector(`#quantity-${products.id._id}`);
+            const buttonLess = document.querySelector(`#less-${products.id._id}`);
+            const buttonMore = document.querySelector(`#more-${products.id._id}`);
+            let quantity = parseInt(quantityElement.textContent);
+
+            buttonLess.addEventListener('click', () => {
+                if (quantity > 1) {
+                    quantity--;
+                    quantityElement.textContent = quantity;
+                    updateQuantity(products.id._id, quantity, -1);
+                }
+            })
+
+            buttonMore.addEventListener('click', () => {
+                if (quantity) {
+                    quantity++;
+                    quantityElement.textContent = quantity;
+                    updateQuantity(products.id._id, quantity, 1);
+                }
+
+            });
+
+            function updateTotal() {
+                const totalPrice = productsInCart.reduce((acc, products) => acc + (products.id.price * products.quantity), 0)
+                totalCart.innerHTML = `$${totalPrice}`
+            }
+            updateTotal();
+
+
+
         });
-        // <a href="" class="buttonAction"><i class="bi bi-x"></i></a>
+
     } catch (error) {
         console.log(error)
         throw error
     }
 }
+
 const obtainIdProduct = (productId) => {
     let product = productsInCart.find(p => p.id._id === productId);
     if (product) {
@@ -86,6 +126,36 @@ const obtainIdProduct = (productId) => {
         console.error('Producto no encontrado');
     }
 }
+
+const updateProductQuantity = async (pid, newQuantity) => {
+    try {
+        const cid = localStorage.getItem('cart_id');
+        const API_URL = `http://localhost:8030/api/carts/${cid}/products/${pid}`;
+
+        const response = await fetch(API_URL, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ quantity: newQuantity })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al actualizar la cantidad del producto');
+        }
+
+        const data = await response.json();
+        console.log('Cantidad actualizada', data);
+
+
+        getProductsInCart();
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
 const deleteProductInCart = async () => {
     try {
         const pid = localStorage.getItem('ID')
@@ -104,7 +174,47 @@ const deleteProductInCart = async () => {
         console.log('Algo salio mal en DELETE:', error)
     }
 }
-// const deleteProductToCart = document.querySelector('#deleteProductToCart')
-// deleteProductInCart.addEventListener('click', deleteProductInCart);
+
+const deleteAllProductsInCart = async () => {
+    try {
+        const response = await fetch(APIWITHID, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+
+        const jsonresponse = response.json()
+        getProductsInCart()
+    } catch (error) {
+        console.log('Algo salio mal en DELETE:', error)
+    }
+}
+
+const vaciarCart = document.querySelector('#vaciarCart')
+vaciarCart.addEventListener('click', deleteAllProductsInCart)
+
+const pucharseCart = async () => {
+    try {
+        const response = await fetch(`${APIWITHID}/purchase`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+        const jsonResponse = response.json()
+        deleteAllProductsInCart()
+
+    } catch (error) {
+        console.log('Algo salio mal en PURCHASE:', error)
+    }
+}
+
+const buyToCart = document.querySelector('#buyToCart')
+buyToCart.addEventListener('click', pucharseCart);
+
+
 
 

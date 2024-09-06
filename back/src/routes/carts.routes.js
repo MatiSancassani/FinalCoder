@@ -24,7 +24,7 @@ router.put("/:cid/products/:pid", validateJWT, updateProductInCart);
 router.delete("/:cid/products/:pid", validateJWT, deleteProductInCart);
 router.delete("/:cid", validateJWT, deleteAllProducts);
 
-router.post("/:cid/purchase", async (req, res) => {
+router.post("/:cid/purchase", validateJWT, async (req, res) => {
   const cid = req.params.cid;
   const cart = await getCartByIdService(cid);
   if (cart) {
