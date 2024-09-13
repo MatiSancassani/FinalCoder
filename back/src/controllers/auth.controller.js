@@ -1,7 +1,8 @@
-import { getUserByEmailService, registerUserService } from "../services/users.services.js";
+import { getUserByEmailService, registerUserService, getUserByIdService } from "../services/users.services.js";
 import { createHash, isValidPassword } from "../utils/bcryptPassword.js";
 import { generateToken } from "../utils/jsonwebtoken.js";
 import { createCartService } from "../services/carts.services.js";
+import jwt from "jsonwebtoken";
 
 import config from "../config.js";
 
@@ -50,7 +51,6 @@ export const createUser = async (req, res) => {
     req.body.password = createHash(req.body.password);
 
     const cart = await createCartService();
-    console.log(cart);
     req.body.cart_id = cart._id;
 
     const response = await registerUserService(req.body);
@@ -59,6 +59,29 @@ export const createUser = async (req, res) => {
     const jwt = generateToken({ _id, name, lastName, email, rol });
 
     res.status(200).send({ origin: config.SERVER, payload: response, jwt });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+  }
+};
+
+export const logoutUser = async (req, res) => {
+  try {
+
+    const token = req.cookies.token;
+    if (token) {
+      const decoded = jwt.verify(token, config.JWT_SECRET_KEY); // Decodifico el token para obtener el ID del usuario
+      const user = await getUserByIdService(decoded._id);
+
+      if (user) {
+        user.last_connection = new Date(); // Actualiza la última conexión
+        await user.save();
+      }
+    }
+
+    res.clearCookie("token", { httpOnly: true, secure: true, sameSite: 'None' });
+    res.status(200).send({ origin: config.SERVER });
+    // res.redirect("http://127.0.0.1:5500/front/pages/login.html");
   } catch (err) {
     console.log(err);
     res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });

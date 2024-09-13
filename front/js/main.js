@@ -1,12 +1,18 @@
 const productsContainer = document.querySelector('#productsContainer');
 let buttonCard = document.querySelectorAll("#button-card");
 const detailProduct = document.querySelector('#detailProduct');
+
+
+
 const API = 'http://localhost:8030/api/products';
+
+
 let productsData = [];
+
+
 
 window.addEventListener('DOMContentLoaded', () => {
     getProducts();
-    updateCartCount();
 })
 
 // OBTENER LISTA DE PRODUCTOS CON METODO GET
@@ -125,6 +131,9 @@ const obtainIdProduct = (productId) => {
     }
 }
 
+window.obtainIdProduct = obtainIdProduct;
+
+
 const deleteProduct = async () => {
     try {
         const pid = localStorage.getItem('ID')
@@ -145,8 +154,8 @@ const deleteProduct = async () => {
         console.log('Algo salio mal en DELETE:', error)
     }
 }
-const confirmDeleteButton = document.querySelector('#confirmDeleteButton');
-confirmDeleteButton.addEventListener('click', deleteProduct);
+const confirmDeleteButtons = document.querySelector('#confirmDeleteButton');
+confirmDeleteButtons.addEventListener('click', deleteProduct);
 
 
 // ADD PRODUCT IN CART
@@ -192,7 +201,7 @@ const addProductInCart = async (pid) => {
         console.log('Algo salio mal en AddToCart:', error)
     }
 }
-
+window.addProductInCart = addProductInCart;
 
 // Función para actualizar el número de elementos en el carrito
 const updateCartCount = async () => {
@@ -231,10 +240,30 @@ const updateCartCount = async () => {
         console.log('Error al actualizar el contador del carrito:', error);
     }
 };
+updateCartCount();
 
+// LOGOUT
+const closeSession = document.querySelector('#logout');
 
-
-
+const logout = async () => {
+    try {
+        const response = await fetch('http://localhost:8030/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        });
+        const jsonresponse = response.json()
+        if (response.ok) {
+            console.log('Session Cerrada')
+            window.location.href = 'http://127.0.0.1:5500/front/pages/login.html';
+        }
+    } catch (error) {
+        console.log('Error al cerrar session', error)
+    }
+}
+closeSession.addEventListener('click', logout);
 
 
 

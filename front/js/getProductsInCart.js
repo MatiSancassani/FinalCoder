@@ -74,7 +74,7 @@ const getProductsInCart = async () => {
 
             const updateQuantity = (pid, currentQuantity) => {
                 let newQuantity = currentQuantity;
-                if (newQuantity < 1) return;  // Avoid quantity less than 1
+                if (newQuantity < 1) return;
                 updateProductQuantity(pid, newQuantity);
             };
 

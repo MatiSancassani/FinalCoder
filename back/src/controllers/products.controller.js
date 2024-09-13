@@ -35,7 +35,8 @@ export const getProductById = async (req, res) => {
 export const addProduct = async (req, res) => {
   try {
     const productBody = req.body;
-    const producto = { ...productBody, owner: req.user.email };
+    const thumbnail = req.file ? `${config.SERVER_UPLOAD_PATH}/${req.file.filename}` : '';
+    const producto = { ...productBody, owner: req.user.email, thumbnail };
 
     const product = await addProductService(producto);
     res.status(200).send({
