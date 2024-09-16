@@ -4,9 +4,6 @@ export const getCartId = async () => {
     try {
         const response = await fetch(API, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
             credentials: 'include' // Para enviar cookies en la petición
         });
 
@@ -14,7 +11,7 @@ export const getCartId = async () => {
             throw new Error('Error en la solicitud getCartId')
         }
         const data = await response.json();
-        const cartId = data.payload;
+        const cartId = data.cartId;
         if (cartId) {
             localStorage.setItem('cart_id', cartId);
             return cartId;
@@ -28,3 +25,11 @@ export const getCartId = async () => {
         return null;
     }
 }
+
+const github = document.querySelector('#github')
+const loginWithGithub = () => {
+    window.location.href = 'http://localhost:8030/api/auth/github';
+    // getCartId();
+}
+
+github.addEventListener('click', loginWithGithub)

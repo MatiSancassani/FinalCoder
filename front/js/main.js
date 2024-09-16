@@ -256,6 +256,7 @@ const logout = async () => {
         });
         const jsonresponse = response.json()
         if (response.ok) {
+            localStorage.clear();
             console.log('Session Cerrada')
             window.location.href = 'http://127.0.0.1:5500/front/pages/login.html';
         }

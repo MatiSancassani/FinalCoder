@@ -16,10 +16,10 @@ import config from "../config.js";
 export const getCartIdService = async (req, res) => {
   try {
     const cartId = req.user.cart_id;
-    res.status(200).send({ origin: config.SERVER, payload: cartId });
+    res.status(200).send({ origin: config.SERVER, cartId });
   } catch (error) {
-    console.log("getCartId ->", err);
-    res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+    console.log("getCartId ->", error);
+    res.status(500).send({ origin: config.SERVER, payload: null, error: error.message });
   }
 }
 export const getCartById = async (req, res) => {
@@ -29,9 +29,9 @@ export const getCartById = async (req, res) => {
     const cart = await getCartByIdService(cid);
 
     res.status(200).send({ origin: config.SERVER, payload: { cart } });
-  } catch (err) {
-    console.log("getCartById ->", err);
-    res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+  } catch (error) {
+    console.log("getCartById ->", error);
+    res.status(500).send({ origin: config.SERVER, payload: null, error: error.message });
   }
 };
 
@@ -60,7 +60,7 @@ export const addProductInCart = async (req, res) => {
 
     if (!(cartUser === cid)) return res.status(400).send({ msg: 'No puedes agregar productos a un carrito que no te pertenece' });
 
-    if (user.rol != 'premium') {
+    if (user.rol === 'user') {
       return res.status(400).send({ msg: 'Requieres rol Premium para agregar productos al carrito' });
     }
 

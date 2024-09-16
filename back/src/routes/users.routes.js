@@ -9,8 +9,24 @@ import { getAllUsers } from "../services/users.services.js";
 const router = Router();
 
 router.put("/:id/role", validateJWT, handlePolicies(["admin"]), roleChange);
+
 router.get("/", validateJWT, handlePolicies(["admin"]), async (req, res) => {
-    const users = await getAllUsers();
+    try {
+        const users = await getAllUsers();
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).send({ message: "Error al obtener los usuarios", error });
+    }
+});
+
+router.get("/profile", validateJWT, handlePolicies(["user", "admin", "premium"]), async (req, res) => {
+    try {
+        const user = req.user;
+        res.status(200).json(user);
+
+    } catch (error) {
+        res.status(500).send({ message: "Error al obtener el usuario", error });
+    }
 });
 
 export default router

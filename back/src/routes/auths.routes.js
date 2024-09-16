@@ -11,10 +11,10 @@ router.post('/register', createUser);
 router.post('/login', loginUser);
 router.post("/logout", logoutUser);
 
-
-
 router.get("/github", passport.authenticate("github", { session: false }));
 router.get("/github/callback", passport.authenticate("github", { session: false }), (req, res) => {
+    const user = req.user
+    console.log(user)
     // Aquí es donde se maneja el JWT y se devuelve al cliente
     res.cookie("token", req.user.token, { httpOnly: true, secure: true, sameSite: 'None' });
     res.redirect(`http://127.0.0.1:5500/front/index.html`);

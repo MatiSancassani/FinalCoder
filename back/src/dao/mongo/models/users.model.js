@@ -17,7 +17,14 @@ const usersSchema = new mongoose.Schema({
     cart_id: {
         type: SchemaTypes.ObjectId,
         ref: 'cart'
-    }
+    },
+    last_connection: {},
+    documents: [
+        {
+            name: { type: String },
+            reference: { type: String }
+        }
+    ]
 
 }, { versionKey: false });
 

@@ -1,6 +1,6 @@
 import { getCartId } from "./getCartId.js";
 
-const github = document.querySelector('#github')
+
 
 document.getElementById('loginForm').addEventListener('submit', function (event) {
     event.preventDefault(); // Evitar que el formulario se envíe de la manera tradicional
@@ -21,7 +21,6 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             const resultDiv = document.getElementById('result');
             if (data.success) {
                 const userId = data.user._id
-                console.log(data)
                 if (userId) {
                     localStorage.setItem('userId', userId);
                 }
@@ -49,15 +48,3 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
 });
 
 
-const loginWithGithub = () => {
-    if (github) {
-        setTimeout(() => {
-            getCartId()
-            window.location.href = 'http://localhost:8030/api/auth/github';
-        }, 1000);
-    } else {
-        console.error('ERROR.');
-
-    }
-}
-github.addEventListener('click', loginWithGithub)

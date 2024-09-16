@@ -76,7 +76,7 @@ export const deleteProduct = async (req, res) => {
     const { email, rol } = req.user;
 
     if (rol === "admin") {
-      await ProductsRepository.removeProduct(pid);
+      await deleteProductService(pid);
       return res.status(200).send({ origin: config.SERVER, payload: { msg: "Producto eliminado" } });
     }
 

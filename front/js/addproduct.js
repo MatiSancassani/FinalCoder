@@ -4,14 +4,6 @@ const createProduct = async () => {
 
         const form = new FormData(document.querySelector('#product-form'));
 
-        // const product = {
-        //     title: form.get('title'),
-        //     description: form.get('description'),
-        //     price: form.get('price'),
-        //     stock: form.get('stock'),
-        //     category: form.get('category')
-        // }
-
         const response = await fetch(API, {
             method: 'POST',
             body: form,
