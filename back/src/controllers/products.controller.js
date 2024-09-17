@@ -35,7 +35,7 @@ export const getProductById = async (req, res) => {
 export const addProduct = async (req, res) => {
   try {
     const productBody = req.body;
-    const thumbnail = req.file ? `${config.SERVER_UPLOAD_PATH}/${req.file.filename}` : '';
+    const thumbnail = req.file ? `${config.SERVER_UPLOAD_PATH}/products/${req.file.filename}` : ''; // URL pública para la imagen
     const producto = { ...productBody, owner: req.user.email, thumbnail };
 
     const product = await addProductService(producto);

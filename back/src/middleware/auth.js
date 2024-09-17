@@ -1,6 +1,14 @@
 // import { validationResult } from "express-validator";
 import jwt from 'jsonwebtoken';
-import config from '../config.js';
+import config, { errorsDictionary } from "../config.js";
+import CustomError from "../services/errors/CustomError.class.js";
+
+export const verifyAuthoentication = (req, res, next) => {
+    if (!req.user) throw new CustomError(errorsDictionary.USER_NOT_FOUND);
+
+    return next();
+};
+
 
 export const validateJWT = (req, res, next) => {
     // const token = req.header('Authorization')?.replace('Bearer ', '');

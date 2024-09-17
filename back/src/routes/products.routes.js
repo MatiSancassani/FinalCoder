@@ -16,7 +16,7 @@ router.get("/", validateJWT, getProduct);
 router.get("/:pid", validateJWT, getProductById);
 router.post("/", validateJWT,
   handlePolicies(["admin", "premium"]),
-  uploader.single('productsImages'),
+  uploader('products').single('productsImages'),
   addProduct);
 router.put("/:pid", validateJWT, updateProduct);
 router.delete("/:pid", validateJWT, deleteProduct);

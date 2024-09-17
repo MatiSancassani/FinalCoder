@@ -10,7 +10,7 @@ const router = Router();
 //     res.status(200).json({ status: 'OK', payload: 'Imagenes Subidas', files: req.files })
 // });
 
-router.post("/documents", validateJWT, uploader.array('documentsImages', 3), async (req, res) => {
+router.post("/documents", validateJWT, uploader('documents').array('documentsImages', 3), async (req, res) => {
     try {
         const { _id } = req.user;
         const user = await getUserByIdService(_id);
@@ -22,7 +22,7 @@ router.post("/documents", validateJWT, uploader.array('documentsImages', 3), asy
         if (req.files && req.files.length > 0) {
             req.files.forEach(file => {
                 const documentName = file.originalname;
-                const documentReference = `${config.UPLOAD_DIR}/documents/${file.filename}`;
+                const documentReference = `${config.SERVER_UPLOAD_PATH}/documents/${file.filename}`; // Cambia UPLOAD_DIR a SERVER_UPLOAD_PATH
                 user.documents.push({ name: documentName, reference: documentReference });
             });
         } else {

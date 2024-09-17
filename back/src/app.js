@@ -3,6 +3,10 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 // import MongoStore from 'connect-mongo';
 import cors from 'cors';
+import http from 'http';
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUiExpress from "swagger-ui-express";
+import initSocket from "./socket.js";
 
 import passport from "./config/passport.strategies.js";
 import config from "./config.js";
@@ -14,6 +18,12 @@ import uploadsRoutes from './routes/uploads.routes.js'
 
 const allowedOrigins = ['http://localhost:5500', 'http://127.0.0.1:5500',];
 const app = express();
+
+const httpServer = http.createServer(app);
+initSocket(httpServer);
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }))
+
 const corsOptions = {
   origin: true, // Permite cualquier origen
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -21,8 +31,29 @@ const corsOptions = {
   credentials: true
 };
 app.use(cors(corsOptions));
-const expressInstance = app.listen(config.PORT, async () => {
+
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: "Documentación Proyecto Final",
+      description: "Documentación API Proyecto Final",
+    },
+  },
+  apis: ["../src/docs/**/*.yaml"],
+};
+const specs = swaggerJSDoc(swaggerOptions);
+app.use("/api/docs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
+
+
+
+
+const PORT = config.PORT || 8030;
+httpServer.listen(PORT, async () => {
   await mongoose.connect(config.MONGODB_URI);
+
+  // const socketServer = initSocket(httpServer);
+  // app.set("socketServer", socketServer);
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));

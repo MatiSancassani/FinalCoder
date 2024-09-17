@@ -4,6 +4,7 @@ import { validateJWT } from "../middleware/auth.js";
 import { handlePolicies } from "../utils/verifys.js";
 import { roleChange } from "../controllers/users.controllers.js";
 import { getAllUsers } from "../services/users.services.js";
+import { verifyAuthoentication } from "../middleware/auth.js";
 
 
 const router = Router();
