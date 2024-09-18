@@ -48,17 +48,23 @@ export const loginUser = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
-    req.body.password = createHash(req.body.password);
+    const { email, password, name, lastName } = req.body;
+    req.body.password = createHash(password);
+
+    const exists = await getUserByEmailService(email);
+    if (exists) return res.status(400).send({ status: "error", error: "User already exists" });
 
     const cart = await createCartService();
     req.body.cart_id = cart._id;
 
     const response = await registerUserService(req.body);
 
-    const { _id, name, lastName, email, rol } = response;
+    const { _id, rol } = response;
     const jwt = generateToken({ _id, name, lastName, email, rol });
 
-    res.status(200).send({ origin: config.SERVER, payload: response, jwt });
+
+
+    res.status(200).send({ status: "success", user: { _id, name, lastName, email, rol }, jwt });
   } catch (err) {
     console.log(err);
     res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
