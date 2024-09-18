@@ -30,7 +30,8 @@
     "socket.io": "^4.7.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "winston": "^3.14.2"
   },
   "devDependencies": {
     "chai": "^5.1.1",

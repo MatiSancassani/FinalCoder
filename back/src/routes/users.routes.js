@@ -20,7 +20,7 @@ router.get("/", validateJWT, handlePolicies(["admin"]), async (req, res) => {
     }
 });
 
-router.get("/profile", validateJWT, handlePolicies(["user", "admin", "premium"]), async (req, res) => {
+router.get("/profile", verifyAuthoentication, handlePolicies(["user", "admin", "premium"]), async (req, res) => {
     try {
         const user = req.user;
         res.status(200).json(user);
