@@ -5,7 +5,6 @@ import CustomError from "../services/errors/CustomError.class.js";
 
 export const verifyAuthoentication = (req, res, next) => {
     if (!req.user) throw new CustomError(errorsDictionary.USER_NOT_FOUND);
-
     return next();
 };
 

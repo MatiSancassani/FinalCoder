@@ -1,5 +1,5 @@
 const API = 'http://localhost:8030/api/users';
-
+let userRegisters = [];
 document.addEventListener('DOMContentLoaded', async () => {
     const usuarios = document.querySelector('#usuarios');
     try {
@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const users = await response.json();
+        userRegisters = users;
         users.forEach(user => {
             const userDiv = document.createElement('div');
             userDiv.classList.add('user');
@@ -25,9 +26,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <option value="premium" ${user.rol === 'premium' ? 'selected' : ''}>Premium</option>
                 </select>
                 <button class="change-role-btn">Cambiar Rol</button>
+                <button id="delete${user._id}" onclick="obtainedIdUsers('${user._id}')"><i class="bi bi-x"></i></button>
             `;
 
             usuarios.appendChild(userDiv);
+
+            const userDelete = document.querySelector(`#delete${user._id}`)
+            userDelete.addEventListener('click', () => {
+                deleteUser();
+            })
         });
 
         document.querySelectorAll('.change-role-btn').forEach(button => {
@@ -52,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
 
                     alert('Rol actualizado correctamente');
+
                 } catch (error) {
                     console.error('Error al cambiar el rol:', error);
                 }
@@ -60,4 +68,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
         console.error('Error al cargar los usuarios:', error);
     }
+
 })
+
+const obtainedIdUsers = (idUsers) => {
+    let usersID = userRegisters.find(user => user._id === idUsers);
+    if (usersID) {
+        const id = usersID._id;
+        localStorage.setItem('ID-USERS', id); // Guarda el ID en localStorage
+        // console.log(`Producto con ID ${id} guardado en localStorage`);
+    } else {
+        console.error('Producto no encontrado');
+    }
+}
+const deleteUser = async () => {
+    try {
+        const userId = localStorage.getItem('ID-USERS')
+        const response = await fetch(`${API}/${userId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        }); alert(`El usuario con iD: ${userId} se elimino correctamente`);
+        const jsonresponse = response.json();
+    } catch (error) {
+        console.log('Algo salio mal en DELETE:', error)
+    }
+}

@@ -1,4 +1,4 @@
-import { getUserByEmailService, registerUserService, getUserByIdService } from "../services/users.services.js";
+import { getUserByEmailService, registerUserService, getUserByIdService, getAllUsers } from "../services/users.services.js";
 import { createHash, isValidPassword } from "../utils/bcryptPassword.js";
 import { generateToken } from "../utils/jsonwebtoken.js";
 import { createCartService } from "../services/carts.services.js";
@@ -93,3 +93,5 @@ export const logoutUser = async (req, res) => {
     res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
   }
 };
+
+

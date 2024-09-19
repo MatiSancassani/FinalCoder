@@ -8,7 +8,6 @@ import { getUserByEmailService, getUserByIdService } from "../services/users.ser
 import { tokenEmail } from '../utils/jsonwebtoken.js';
 import { createHash } from '../utils/bcryptPassword.js'
 
-
 export const roleChange = async (req, res) => {
     const { id } = req.params;
     const { rol } = req.body;

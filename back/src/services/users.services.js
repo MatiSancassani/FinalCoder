@@ -10,3 +10,5 @@ export const registerUserService = async (user) => await usersModel.create({ ...
 export const getAllUsers = async () => await usersModel.find().lean();
 
 export const findByIdAndUpdateRol = async () => await usersModel.findByIdAndUpdate(id, { rol }, { new: true }).lean();
+
+export const deleteUserService = async (id) => await usersModel.findByIdAndDelete(id);
