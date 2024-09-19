@@ -1,5 +1,5 @@
 # Final Project
-![Logo](https://github.com/user-attachments/assets/373d170b-054d-4955-8072-6bac0bfa58f2)
+![Logo - Copy](https://github.com/user-attachments/assets/c04e81db-75f3-46c7-aa90-bd3965562674)
 
 **Descripción:**
 Este proyecto es una aplicación web ecommerse
