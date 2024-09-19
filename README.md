@@ -37,7 +37,7 @@ La imagenes se guardaran en public/uploads/documents
 * Los usuarios que pasen inactivos > 30minutos son eliminados y notificados via email
 * El boton salir, destruye la session borra el token, cookies y datos del localStorage
 
-***TEST:**
+**TEST:**
 * Test unitario sobre hasheo de passwords
 * Test de integracion para registro, logueo y no registrar usuarios con mismo email
 * Winston, creacion personalizada de informes

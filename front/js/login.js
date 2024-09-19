@@ -21,6 +21,8 @@ document.getElementById('loginForm').addEventListener('submit', function (event)
             const resultDiv = document.getElementById('result');
             if (data.success) {
                 const userId = data.user._id
+                const userRol = data.user.rol
+                localStorage.setItem('userRol', userRol)
                 if (userId) {
                     localStorage.setItem('userId', userId);
                 }

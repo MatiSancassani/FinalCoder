@@ -5,7 +5,7 @@ const detailProduct = document.querySelector('#detailProduct');
 
 
 const API = 'http://localhost:8030/api/products';
-
+const APIUSERS = 'http://localhost:8030/api/users';
 
 let productsData = [];
 
@@ -34,10 +34,11 @@ const getProducts = async () => {
         productsData = products
         productsContainer.innerHTML = '';
         const email = localStorage.getItem('userEmail');
+        const rolUser = localStorage.getItem('userRol');
         products.forEach(product => {
             const div = document.createElement("div");
             div.classList.add("card-container");
-            if (email === product.owner) {
+            if (email === product.owner || rolUser === 'admin') {
                 div.innerHTML = `
             <div class="actionMenu">
                 <button type="button" class="btn buttonEdit" data-bs-toggle="modal" data-bs-target="#exampleModa2" onclick="editProduct('${product._id}')">
@@ -68,11 +69,9 @@ const getProducts = async () => {
     } catch (error) {
         console.log(error)
     }
-
 };
 
 // EDITAR FORM CON METODO PUT
-
 const editProduct = (productId) => {
 
     let product = productsData.find(p => p._id === productId);

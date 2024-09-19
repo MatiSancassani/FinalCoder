@@ -5,8 +5,9 @@ import {
   updateProductService,
   deleteProductService,
 } from "../services/products.services.js";
-
+import { getUserByEmailService } from "../services/users.services.js";
 import config from "../config.js";
+import nodemailer from "nodemailer";
 
 export const getProduct = async (req, res) => {
   try {
@@ -75,21 +76,68 @@ export const deleteProduct = async (req, res) => {
     const { pid } = req.params;
     const { email, rol } = req.user;
 
+    const product = await getProductByIdService(pid);
+    console.log(product)
+
+    // Si el usuario es admin, también necesitamos comprobar si el dueño es premium
     if (rol === "admin") {
       await deleteProductService(pid);
+
+      // Comprobar si el dueño del producto es premium
+      const productOwner = await getUserByEmailService(product.owner); // Asegúrate de tener esta función que devuelve el dueño
+      if (productOwner.rol === "premium") {
+        await sendProductDeletedEmail(productOwner.email, product);
+      }
+
       return res.status(200).send({ origin: config.SERVER, payload: { msg: "Producto eliminado" } });
     }
 
-    const product = await getProductByIdService(pid);
-
+    // Si el usuario no es admin, comprobar si es el dueño
     if (product.owner !== email) {
       return res.status(403).send({ msg: "No puedes eliminar un producto que no te pertenece" });
     } else {
+      // Eliminar el producto
       const producto = await deleteProductService(pid);
-      res.status(200).send({ origin: config.SERVER, payload: { msg: "Producto eliminado", producto } });
+
+      // Si el usuario es premium, enviar un correo informando de la eliminación del producto
+      if (rol === "premium") {
+        await sendProductDeletedEmail(email, product);
+      }
+
+      return res.status(200).send({ origin: config.SERVER, payload: { msg: "Producto eliminado", producto } });
     }
   } catch (err) {
     console.log("remove ->", err);
-    res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+    return res.status(500).send({ origin: config.SERVER, payload: null, error: err.message });
+  }
+};
+
+// Función para enviar correo cuando un producto es eliminado
+const sendProductDeletedEmail = async (email, product) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: 'Gmail',
+      auth: {
+        user: config.GMAIL_APP_USER,
+        pass: config.GMAIL_APP_PASS,
+      },
+    });
+
+    const mailOptions = {
+      from: config.GMAIL_APP_USER,
+      to: email,
+      subject: 'Producto eliminado',
+      html: `
+        <h1>Tu producto ha sido eliminado</h1>
+        <p>Hola,</p>
+        <p>Te informamos que tu producto <strong>${product.title}</strong> ha sido eliminado del sistema.</p>
+        <p>Si tienes alguna duda, no dudes en contactarnos.</p>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Correo enviado:', info.response);
+  } catch (err) {
+    console.error('Error al enviar el correo:', err);
   }
 };
